@@ -1,0 +1,5 @@
+- include_tasks: install-mysql.yml
+- include_tasks: configure.yml
+- include_tasks: initialize.yml
+- include_tasks: create-database.yml
+- include_tasks: create-user.yml

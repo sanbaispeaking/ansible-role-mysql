@@ -1,0 +1,7 @@
+# mysql could use a short period of time between restarts.
+- name: restart mysql
+  service: "name={{ mysql_daemon }} state=restarted sleep=5"
+
+# the ubuntu equivalent of SELinux
+- name: restart apparmor
+  service: name=apparmor state=restarted

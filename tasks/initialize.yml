@@ -1,0 +1,35 @@
+# initialize is optional and should be idempotent
+# FIXME: cause play to terminate makes start mysqld task unreachable.
+- name: Init MySQL database
+  command: mysqld --initialize
+  register: mysql_database_initialized
+
+# auto generated root password would be found in log
+# FIXME: mysqld --initialize might be invoked more than once resulting multiple lines of log entries.
+- name: Capture temporary password
+  command: "grep 'for root@localhost: .*$' {{ mysql_log_error }}"
+  register: temporary_password_line
+  when: not mysql_database_initialized.failed
+
+- set_fact:
+    temporary_mysql_root_password: "{{ temporary_password_line.stdout.split('root@localhost: ')[-1] }}"
+  when: not mysql_database_initialized.failed
+
+# start mysqld anyway
+- name: Ensure MySQL is started and enabled on boot
+  service: "name={{ mysql_daemon }} state=started enabled=yes"
+
+# the generated root password is always expired
+- name: Update MySQL root password
+  command: mysql -uroot  --connect-expired-password -p{{ temporary_mysql_root_password }} -NBe
+    'ALTER USER "root"@"localhost" IDENTIFIED WITH mysql_native_password BY "{{ mysql_root_password }}"'
+  register: mysql_root_password_updated
+  when: not mysql_database_initialized.failed and mysql_root_password is defined
+
+# Now you have root access without password
+- name: Write password credential
+  template:
+    src: root-my.cnf.j2
+    dest: "{{ mysql_root_home }}/.my.cnf"
+  when: not mysql_database_initialized.failed and not mysql_root_password_updated.failed
+    and mysql_root_password is defined

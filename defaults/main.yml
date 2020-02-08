@@ -1,0 +1,45 @@
+mysql_daemon: mysql # The daemon or service name of ubuntu mysql
+mysql_config_file: /etc/mysql/my.cnf
+mysql_config_include_dir: /etc/mysql/conf.d
+mysql_datadir: /var/lib/mysql
+
+# MySQL connection settings
+mysql_port: 3306
+mysql_bind_address: "0.0.0.0"
+mysql_pid_file: /var/run/mysqld/mysqld.pid
+mysql_socket: /var/run/mysqld/mysqld.sock
+
+# MySQL log settings
+mysql_log_dir: /var/log/mysql
+mysql_slow_query_log_file: /var/log/mysql/mysql-slow.log
+mysql_log_error: /var/log/mysql/error.log
+
+# Tunning
+# We do not use MyISAM, still keep moderate settings
+mysql_max_connections: 151
+
+# InnoDB settings
+# optimized for 1GB RAM
+mysql_innodb_buffer_pool_size: "256M"
+mysql_innodb_log_file_size: "64M"
+mysql_innodb_log_buffer_size: "8M"
+mysql_innodb_flush_log_at_trx_commit: "1"
+mysql_innodb_lock_wait_timeout: "50"
+
+# Default mysql packages to install. Can be substituted with a custom list of packages.
+mysql_packages:
+  - mysql-client
+  - mysql-server
+
+# The default mysql root user
+# Ansible would use this user to login mysql
+mysql_root_home: /root
+mysql_root_username: root
+
+# Miscellaneous settings
+
+# mysqld executable bin
+mysql_bin: /usr/sbin/mysqld
+
+mysql_users: []
+mysql_databases: []
