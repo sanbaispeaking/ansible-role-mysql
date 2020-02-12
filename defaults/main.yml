@@ -40,6 +40,8 @@ mysql_root_username: root
 
 # mysqld executable bin
 mysql_bin: /usr/sbin/mysqld
+# force init against mysql datadir
+mysql_force_init: no
 
 mysql_users: []
 mysql_databases: []

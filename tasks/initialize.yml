@@ -1,3 +1,18 @@
+- name: Clear MySQL datadir
+  file:
+    path: "{{ mysql_datadir }}"
+    state: absent
+  when: mysql_force_init is defined and mysql_force_init
+
+- name: Ensure MySQL datadir
+  file:
+    path: "{{ mysql_datadir }}"
+    state: directory
+    recurse: yes
+    owner: mysql
+    group: mysql
+    mode: 0755
+
 # initialize is optional and should be idempotent
 # FIXME: cause play to terminate makes start mysqld task unreachable.
 - name: Init MySQL database
@@ -7,12 +22,12 @@
 # auto generated root password would be found in log
 # FIXME: mysqld --initialize might be invoked more than once resulting multiple lines of log entries.
 - name: Capture temporary password
-  command: "grep 'for root@localhost: .*$' {{ mysql_log_error }}"
+  command: 'grep "for root@localhost: \S*$" {{ mysql_log_error }}'
   register: temporary_password_line
   when: not mysql_database_initialized.failed
 
 - set_fact:
-    temporary_mysql_root_password: "{{ temporary_password_line.stdout.split('root@localhost: ')[-1] }}"
+    temporary_mysql_root_password: "{{ temporary_password_line.stdout_lines[-1].split('root@localhost: ')[-1] }}"
   when: not mysql_database_initialized.failed
 
 # start mysqld anyway
